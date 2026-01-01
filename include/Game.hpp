@@ -3,8 +3,6 @@
 #include <memory>
 #include <vector>
 
-class Player;
-
 class Game {
 public:
   void displayChoice(std::vector<std::string> choices, int &selected);
@@ -18,7 +16,9 @@ public:
   void printHealthBar(Character &character);
   int getGameSelection(Enemy &enemy, std::vector<std::string> &choices);
   void generateStage(Enemy &enemy);
+  void enemyTurn(Enemy &enemy);
   void printActionLog();
+  static void addToActionLog(std::string &text);
   void startMenu();
   void run();
 

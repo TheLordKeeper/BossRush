@@ -18,7 +18,15 @@ void Character::basicAttack(Character &target) {
 
   std::string text = "\n" + this->name + " dealt " + std::to_string(damage) +
                      " damage to " + target.name + "!";
-  Game::actionLog.push_back(text);
+
+  Game::addToActionLog(text);
+}
+
+bool Character::checkAlive() {
+  if (this->stats.health > 0) {
+    return true;
+  } else
+    return false;
 }
 
 Stats Enemy::getEnemyStats(Stats &baseStats, int wave) {

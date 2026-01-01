@@ -19,6 +19,7 @@ public:
 
   virtual void basicAttack(Character &target);
   virtual void takeDamage(int damage);
+  bool checkAlive();
 
   std::string name;
   Stats stats;

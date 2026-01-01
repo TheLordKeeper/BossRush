@@ -153,6 +153,13 @@ void Game::printHealthBar(Character &character) {
   printw("} %i/%i\n", health, maxHealth);
 }
 
+void Game::printActionLog() {
+  for (auto log : actionLog) {
+    printw(log.c_str());
+    printw("\n");
+  }
+}
+
 int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
   bool run{true};
   int selected{0};
@@ -165,6 +172,7 @@ int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
     printw("\n");
 
     displayChoice(choices, selected);
+    printActionLog();
     int ch{getch()};
 
     switch (ch) {
@@ -190,11 +198,16 @@ int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
   return -1;
 }
 
-void Game::printActionLog() {
-  for (auto log : actionLog) {
-    printw(log.c_str());
-    printw("\n");
+void Game::addToActionLog(std::string &text) {
+  if (actionLog.size() >= 3) {
+    actionLog.erase(actionLog.begin());
   }
+  actionLog.push_back(text);
+}
+
+void Game::enemyTurn(Enemy &enemy) {
+  enemy.basicAttack(*player);
+  return;
 }
 
 void Game::generateStage(Enemy &enemy) {
@@ -208,7 +221,6 @@ void Game::generateStage(Enemy &enemy) {
 
   while (run) {
     int selected{getGameSelection(enemy, attackChoices)};
-    printActionLog();
 
     switch (selected) {
     case Attack:
@@ -218,8 +230,7 @@ void Game::generateStage(Enemy &enemy) {
     default:
       return;
     }
-    refresh();
-    getch();
+    enemyTurn(enemy);
   }
 }
 
