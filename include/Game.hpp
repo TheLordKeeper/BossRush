@@ -15,9 +15,14 @@ public:
   std::unique_ptr<Enemy> generateEnemy();
   EnemyType getRandomEnemyType();
   void newGame();
-  void makeStage();
+  void printHealthBar(Character &character);
+  int getGameSelection(Enemy &enemy, std::vector<std::string> &choices);
+  void generateStage(Enemy &enemy);
+  void printActionLog();
   void startMenu();
   void run();
+
+  static std::vector<std::string> actionLog;
 
 private:
   int wave{1};

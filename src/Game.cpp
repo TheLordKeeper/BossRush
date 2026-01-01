@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+std::vector<std::string> Game::actionLog{};
+
 void Game::boldPrint(std::string phrase) {
   attron(A_REVERSE);
   printw(phrase.c_str());
@@ -124,16 +126,117 @@ void Game::newGame() {
   keypad(stdscr, TRUE);
 }
 
+void Game::printHealthBar(Character &character) {
+  int maxHealth{character.stats.maxHealth};
+  int health{character.stats.health};
+  int units{10};
+  int full{(health * units) / maxHealth};
+  int empty{units - full};
+
+  int color;
+  if (health > maxHealth * 0.6)
+    color = 1;
+  else if (health > maxHealth * 0.3)
+    color = 2;
+  else
+    color = 3;
+  printw("%s\nHP: {", character.name.c_str());
+  attron(COLOR_PAIR(color));
+  for (int i{}; i < full; i++) {
+    addch(ACS_BLOCK);
+  }
+  attroff(COLOR_PAIR(color));
+
+  for (int i{}; i < empty; i++) {
+    addch(' ');
+  }
+  printw("} %i/%i\n", health, maxHealth);
+}
+
+int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
+  bool run{true};
+  int selected{0};
+
+  while (run) {
+    clear();
+    printHealthBar(*player);
+    printw("\n");
+    printHealthBar(enemy);
+    printw("\n");
+
+    displayChoice(choices, selected);
+    int ch{getch()};
+
+    switch (ch) {
+    case KEY_UP:
+    case 'w':
+      selected--;
+      break;
+
+    case KEY_DOWN:
+    case 's':
+      selected++;
+      break;
+
+    case '\n':
+      return selected;
+    }
+
+    if (selected < 0)
+      selected = choices.size() - 1;
+    if (selected > choices.size() - 1)
+      selected = 0;
+  }
+  return -1;
+}
+
+void Game::printActionLog() {
+  for (auto log : actionLog) {
+    printw(log.c_str());
+    printw("\n");
+  }
+}
+
+void Game::generateStage(Enemy &enemy) {
+  bool run{true};
+  std::vector<std::string> attackChoices{"Attack", "Skills", "Items"};
+  actionLog = {};
+
+  const int Attack{0};
+  const int Skills{1};
+  const int Items{2};
+
+  while (run) {
+    int selected{getGameSelection(enemy, attackChoices)};
+    printActionLog();
+
+    switch (selected) {
+    case Attack:
+      player->basicAttack(enemy);
+      break;
+
+    default:
+      return;
+    }
+    refresh();
+    getch();
+  }
+}
+
 void Game::run() {
   bool running{true};
   NcursesSession n;
+  start_color();
+  init_pair(1, COLOR_GREEN, COLOR_BLACK);
+  init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(3, COLOR_RED, COLOR_BLACK);
 
   startMenu();
+
   if (player) {
-    printw(player->name.c_str());
-    refresh();
+    auto enemy{generateEnemy()};
+    generateStage(*enemy);
   }
-  getch();
 
   return;
 }

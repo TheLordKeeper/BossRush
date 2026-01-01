@@ -17,6 +17,9 @@ public:
 
   virtual ~Character() = default;
 
+  virtual void basicAttack(Character &target);
+  virtual void takeDamage(int damage);
+
   std::string name;
   Stats stats;
 
