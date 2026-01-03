@@ -9,14 +9,15 @@ public:
   void boldPrint(std::string phrase);
   int getMenuSelection(const std::vector<std::string> &choices,
                        const std::string &prompt);
-  int getWave();
+  int getWave() const;
   std::unique_ptr<Enemy> generateEnemy();
   EnemyType getRandomEnemyType();
   void newGame();
   void printHealthBar(Character &character);
   int getGameSelection(Enemy &enemy, std::vector<std::string> &choices);
-  void generateStage(Enemy &enemy);
+  bool generateStage(Enemy &enemy);
   void enemyTurn(Enemy &enemy);
+  bool playAgain();
   void printActionLog();
   static void addToActionLog(std::string &text);
   void startMenu();

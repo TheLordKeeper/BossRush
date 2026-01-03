@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+//  TODO: Implement EXP mechanic
+
 std::vector<std::string> Game::actionLog{};
 
 void Game::boldPrint(std::string phrase) {
@@ -15,7 +17,7 @@ void Game::boldPrint(std::string phrase) {
   attroff(A_REVERSE);
 }
 
-int Game::getWave() { return wave; }
+int Game::getWave() const { return wave; }
 
 EnemyType Game::getRandomEnemyType() {
   static std::random_device rd;
@@ -31,7 +33,7 @@ EnemyType Game::getRandomEnemyType() {
 std::unique_ptr<Enemy> Game::generateEnemy() {
   EnemyType type{getRandomEnemyType()};
 
-  Stats baseStats{50, 50, 5, 3};
+  Stats baseStats{20, 20, 3, 1};
   Stats stats{Enemy::getEnemyStats(baseStats, getWave())};
 
   return std::make_unique<Enemy>(type, stats);
@@ -140,7 +142,9 @@ void Game::printHealthBar(Character &character) {
     color = 2;
   else
     color = 3;
+
   printw("%s\nHP: {", character.name.c_str());
+
   attron(COLOR_PAIR(color));
   for (int i{}; i < full; i++) {
     addch(ACS_BLOCK);
@@ -166,6 +170,7 @@ int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
 
   while (run) {
     clear();
+    printw("Wave: %i\n", wave);
     printHealthBar(*player);
     printw("\n");
     printHealthBar(enemy);
@@ -173,6 +178,7 @@ int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
 
     displayChoice(choices, selected);
     printActionLog();
+
     int ch{getch()};
 
     switch (ch) {
@@ -210,7 +216,7 @@ void Game::enemyTurn(Enemy &enemy) {
   return;
 }
 
-void Game::generateStage(Enemy &enemy) {
+bool Game::generateStage(Enemy &enemy) {
   bool run{true};
   std::vector<std::string> attackChoices{"Attack", "Skills", "Items"};
   actionLog = {};
@@ -220,6 +226,12 @@ void Game::generateStage(Enemy &enemy) {
   const int Items{2};
 
   while (run) {
+    if (!player->checkAlive()) {
+      return false;
+    } else if (!enemy.checkAlive()) {
+      return true;
+    }
+
     int selected{getGameSelection(enemy, attackChoices)};
 
     switch (selected) {
@@ -228,14 +240,33 @@ void Game::generateStage(Enemy &enemy) {
       break;
 
     default:
-      return;
+      return false;
     }
     enemyTurn(enemy);
   }
+  return false;
+}
+
+bool Game::playAgain() {
+  clear();
+  std::string phrase = "You have died! You lasted until wave " +
+                       std::to_string(wave) + "!\nDo you want to play again?";
+
+  std::vector<std::string> choices{"Yes", "No"};
+  int selected{getMenuSelection(choices, phrase)};
+
+  switch (selected) {
+  case 0:
+    return true;
+  case 1:
+    return false;
+  }
+
+  return false;
 }
 
 void Game::run() {
-  bool running{true};
+  bool gameOver{false};
   NcursesSession n;
   start_color();
   init_pair(1, COLOR_GREEN, COLOR_BLACK);
@@ -243,10 +274,23 @@ void Game::run() {
   init_pair(3, COLOR_RED, COLOR_BLACK);
 
   startMenu();
+  if (!player) {
+    return;
+  }
 
-  if (player) {
+  while (!gameOver) {
     auto enemy{generateEnemy()};
-    generateStage(*enemy);
+    if (generateStage(*enemy)) {
+      wave++;
+    } else {
+      if (playAgain()) {
+        player.reset();
+        newGame();
+        wave = 0;
+      } else {
+        gameOver = true;
+      }
+    }
   }
 
   return;
