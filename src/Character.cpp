@@ -30,10 +30,10 @@ bool Character::checkAlive() {
 }
 
 Stats Enemy::getEnemyStats(Stats &baseStats, int wave) {
-  int maxHealth = baseStats.maxHealth + wave * 10;
+  int maxHealth = baseStats.maxHealth + wave * 3;
   int health = maxHealth;
-  int attack = baseStats.attack + wave * 5;
-  int defence = baseStats.defence + wave * 3;
+  int attack = baseStats.attack + wave * 2;
+  int defence = baseStats.defence + wave * 1;
   return {health, maxHealth, attack, defence};
 };
 
@@ -47,5 +47,24 @@ std::string Enemy::typeToName(EnemyType type) {
     return "Troll";
   default:
     return "Enemy";
+  }
+}
+
+void Player::levelUp() {
+  xp -= xpUntilLevel;
+  xpUntilLevel *= 1.25;
+
+  this->stats.attack += 2;
+  this->stats.defence += 1;
+  this->stats.maxHealth += 10;
+  this->stats.health = this->stats.maxHealth;
+
+  return;
+}
+
+void Player::addXP(int amount) {
+  xp += amount;
+  if (xp >= xpUntilLevel) {
+    levelUp();
   }
 }

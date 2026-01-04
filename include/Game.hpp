@@ -5,6 +5,10 @@
 
 class Game {
 public:
+  void run();
+  static void addToActionLog(std::string &text);
+
+private:
   void displayChoice(std::vector<std::string> choices, int &selected);
   void boldPrint(std::string phrase);
   int getMenuSelection(const std::vector<std::string> &choices,
@@ -18,14 +22,12 @@ public:
   bool generateStage(Enemy &enemy);
   void enemyTurn(Enemy &enemy);
   bool playAgain();
+  int calculateWaveXP();
   void printActionLog();
-  static void addToActionLog(std::string &text);
   void startMenu();
-  void run();
 
   static std::vector<std::string> actionLog;
 
-private:
   int wave{1};
   std::unique_ptr<Player> player;
 };

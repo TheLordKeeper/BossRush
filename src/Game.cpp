@@ -1,6 +1,7 @@
 #include "../include/Game.hpp"
 #include "../include/Character.hpp"
 #include "../include/ncurses.hpp"
+#include <cmath>
 #include <memory>
 #include <ncurses.h>
 #include <random>
@@ -265,6 +266,10 @@ bool Game::playAgain() {
   return false;
 }
 
+int Game::calculateWaveXP() {
+  return static_cast<int>(20 * std::pow(wave, 1.15));
+}
+
 void Game::run() {
   bool gameOver{false};
   NcursesSession n;
@@ -281,12 +286,15 @@ void Game::run() {
   while (!gameOver) {
     auto enemy{generateEnemy()};
     if (generateStage(*enemy)) {
+      actionLog.clear();
+      int xp{calculateWaveXP()};
+      player->addXP(calculateWaveXP());
       wave++;
     } else {
       if (playAgain()) {
         player.reset();
         newGame();
-        wave = 0;
+        wave = 1;
       } else {
         gameOver = true;
       }

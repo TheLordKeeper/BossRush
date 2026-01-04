@@ -30,8 +30,12 @@ private:
 class Player : public Character {
 public:
   Player(const std::string &n, const Stats &s) : Character(n, s) {};
+  void addXP(int amount);
+  void levelUp();
 
 private:
+  int xp{0};
+  int xpUntilLevel{100};
 };
 
 class Enemy : public Character {
