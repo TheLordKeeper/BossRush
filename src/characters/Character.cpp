@@ -1,5 +1,5 @@
-#include "../include/Character.hpp"
-#include "../include/Game.hpp"
+#include "../../include/Character.hpp"
+#include "../../include/Game.hpp"
 #include <ncurses.h>
 #include <string>
 

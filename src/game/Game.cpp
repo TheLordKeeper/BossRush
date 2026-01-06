@@ -1,6 +1,6 @@
-#include "../include/Game.hpp"
-#include "../include/Character.hpp"
-#include "../include/ncurses.hpp"
+#include "../../include/Game.hpp"
+#include "../../include/Character.hpp"
+#include "../../include/ncurses.hpp"
 #include <cmath>
 #include <memory>
 #include <ncurses.h>

@@ -8,8 +8,8 @@ find_package(Curses REQUIRED)
 
 add_executable(Game
   main.cpp
-  src/Game.cpp
-  src/Character.cpp
+  src/game/Game.cpp
+  src/characters/Character.cpp
 )
 
 target_link_libraries(Game PRIVATE ${CURSES_LIBRARIES})
