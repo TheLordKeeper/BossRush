@@ -1,6 +1,6 @@
-#include "../../include/Game.hpp"
-#include "../../include/Character.hpp"
-#include "../../include/ncurses.hpp"
+#include "../../include/game/Game.hpp"
+#include "../../include/characters/Character.hpp"
+#include "../../include/utils/ncurses.hpp"
 #include <cmath>
 #include <memory>
 #include <ncurses.h>
@@ -8,15 +8,7 @@
 #include <string>
 #include <vector>
 
-//  TODO: Implement EXP mechanic
-
 std::vector<std::string> Game::actionLog{};
-
-void Game::boldPrint(std::string phrase) {
-  attron(A_REVERSE);
-  printw(phrase.c_str());
-  attroff(A_REVERSE);
-}
 
 int Game::getWave() const { return wave; }
 
@@ -40,75 +32,6 @@ std::unique_ptr<Enemy> Game::generateEnemy() {
   return std::make_unique<Enemy>(type, stats);
 }
 
-void Game::displayChoice(std::vector<std::string> choices, int &selected) {
-  for (auto i{0}; i < choices.size(); i++) {
-    if (i == selected) {
-      boldPrint(choices[i]);
-    } else {
-      printw(choices[i].c_str());
-    }
-    printw("\n");
-  }
-}
-
-int Game::getMenuSelection(const std::vector<std::string> &choices,
-                           const std::string &prompt) {
-  int selected{0};
-
-  while (true) {
-    clear();
-    printw("%s\n", prompt.c_str());
-    displayChoice(choices, selected);
-    refresh();
-
-    int ch{getch()};
-
-    switch (ch) {
-    case KEY_UP:
-    case 'w':
-      selected--;
-      break;
-
-    case KEY_DOWN:
-    case 's':
-      selected++;
-      break;
-
-    case '\n':
-      return selected;
-    }
-
-    if (selected < 0)
-      selected = choices.size() - 1;
-    if (selected > choices.size() - 1)
-      selected = 0;
-  }
-  return -1;
-}
-
-void Game::startMenu() {
-  if (!NcursesSession::active) {
-    return;
-  };
-
-  std::string prompt{"Welcome to my game! Please selected an option"};
-  std::vector<std::string> choices{"New Game", "Load Game", "Exit"};
-
-  int selected{Game::getMenuSelection(choices, prompt)};
-
-  switch (selected) {
-  case 0:
-    Game::newGame();
-    break;
-
-  case 1:
-    break;
-
-  case 2:
-    return;
-  }
-}
-
 void Game::newGame() {
   echo();
   nocbreak();
@@ -129,42 +52,6 @@ void Game::newGame() {
   keypad(stdscr, TRUE);
 }
 
-void Game::printHealthBar(Character &character) {
-  int maxHealth{character.stats.maxHealth};
-  int health{character.stats.health};
-  int units{10};
-  int full{(health * units) / maxHealth};
-  int empty{units - full};
-
-  int color;
-  if (health > maxHealth * 0.6)
-    color = 1;
-  else if (health > maxHealth * 0.3)
-    color = 2;
-  else
-    color = 3;
-
-  printw("%s\nHP: {", character.name.c_str());
-
-  attron(COLOR_PAIR(color));
-  for (int i{}; i < full; i++) {
-    addch(ACS_BLOCK);
-  }
-  attroff(COLOR_PAIR(color));
-
-  for (int i{}; i < empty; i++) {
-    addch(' ');
-  }
-  printw("} %i/%i\n", health, maxHealth);
-}
-
-void Game::printActionLog() {
-  for (auto log : actionLog) {
-    printw(log.c_str());
-    printw("\n");
-  }
-}
-
 int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
   bool run{true};
   int selected{0};
@@ -172,13 +59,13 @@ int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
   while (run) {
     clear();
     printw("Wave: %i\n", wave);
-    printHealthBar(*player);
+    ui.printHealthBar(*player);
     printw("\n");
-    printHealthBar(enemy);
+    ui.printHealthBar(enemy);
     printw("\n");
 
-    displayChoice(choices, selected);
-    printActionLog();
+    ui.displayChoice(choices, selected);
+    ui.printActionLog(actionLog);
 
     int ch{getch()};
 
@@ -254,7 +141,7 @@ bool Game::playAgain() {
                        std::to_string(wave) + "!\nDo you want to play again?";
 
   std::vector<std::string> choices{"Yes", "No"};
-  int selected{getMenuSelection(choices, phrase)};
+  int selected{ui.getMenuSelection(choices, phrase)};
 
   switch (selected) {
   case 0:
@@ -270,6 +157,24 @@ int Game::calculateWaveXP() {
   return static_cast<int>(20 * std::pow(wave, 1.15));
 }
 
+void Game::startMenu() {
+  std::string prompt{"Welcome to my game! Please selected an option"};
+  std::vector<std::string> choices{"New Game", "Load Game", "Exit"};
+
+  int selected{ui.getMenuSelection(choices, prompt)};
+
+  switch (selected) {
+  case 0:
+    newGame();
+
+  case 1:
+    return;
+
+  case 2:
+    return;
+  }
+}
+
 void Game::run() {
   bool gameOver{false};
   NcursesSession n;
@@ -278,7 +183,8 @@ void Game::run() {
   init_pair(2, COLOR_YELLOW, COLOR_BLACK);
   init_pair(3, COLOR_RED, COLOR_BLACK);
 
-  startMenu();
+  Game::startMenu();
+
   if (!player) {
     return;
   }
