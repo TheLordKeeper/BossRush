@@ -3,6 +3,7 @@ project(Game.cpp LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
@@ -13,6 +14,7 @@ add_executable(Game
   src/game/Game.cpp
   src/characters/Character.cpp
   src/game/UI.cpp
+  src/game/SaveManager.cpp
 )
 
 target_link_libraries(Game PRIVATE ${CURSES_LIBRARIES})

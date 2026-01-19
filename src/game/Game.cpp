@@ -2,15 +2,22 @@
 #include "../../include/characters/Character.hpp"
 #include "../../include/utils/ncurses.hpp"
 #include <cmath>
+#include <filesystem>
 #include <memory>
 #include <ncurses.h>
 #include <random>
 #include <string>
 #include <vector>
 
+Game::Game(std::filesystem::path dir) : saveDir(dir) {
+  std::filesystem::create_directories(saveDir);
+};
+
 std::vector<std::string> Game::actionLog{};
 
 int Game::getWave() const { return wave; }
+
+Player &Game::getPlayer() const { return *player; }
 
 EnemyType Game::getRandomEnemyType() {
   static std::random_device rd;
@@ -191,21 +198,23 @@ void Game::run() {
 
   while (!gameOver) {
     auto enemy{generateEnemy()};
-    if (generateStage(*enemy)) {
+
+    if (generateStage(*enemy)) { // If the player wins
       actionLog.clear();
       int xp{calculateWaveXP()};
       player->addXP(calculateWaveXP());
       wave++;
+
+    } else if (playAgain()) {
+      player.reset();
+      newGame();
+      wave = 1;
     } else {
-      if (playAgain()) {
-        player.reset();
-        newGame();
-        wave = 1;
-      } else {
-        gameOver = true;
-      }
+      gameOver = true;
     }
   }
+
+  saveManager.saveGame(*this, saveDir / "save.txt");
 
   return;
 }

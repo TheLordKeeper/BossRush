@@ -1,18 +1,25 @@
 #pragma once
 #include "../../include/game/UI.hpp"
 #include "../characters/Character.hpp"
+#include "SaveManager.hpp"
+#include <filesystem>
 #include <memory>
 #include <vector>
 
 class Game {
 public:
   UI ui;
+  SaveManager saveManager;
+
+  explicit Game(std::filesystem::path saveDir);
 
   void run();
   static void addToActionLog(std::string &text);
+  int getWave() const;
+  Player &getPlayer() const;
 
 private:
-  int getWave() const;
+  std::filesystem::path saveDir;
   void startMenu();
   std::unique_ptr<Enemy> generateEnemy();
   EnemyType getRandomEnemyType();

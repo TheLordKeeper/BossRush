@@ -53,11 +53,17 @@ std::string Enemy::typeToName(EnemyType type) {
 void Player::levelUp() {
   xp -= xpUntilLevel;
   xpUntilLevel *= 1.25;
+  level++;
 
   this->stats.attack += 2;
   this->stats.defence += 1;
   this->stats.maxHealth += 10;
   this->stats.health = this->stats.maxHealth;
+
+  std::string phrase{"Level up! " + this->name + " is now level " +
+                     std::to_string(this->level) + "!"};
+
+  Game::addToActionLog(phrase);
 
   return;
 }

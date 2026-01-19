@@ -34,6 +34,7 @@ public:
   void levelUp();
 
 private:
+  int level{1};
   int xp{0};
   int xpUntilLevel{100};
 };
