@@ -16,6 +16,7 @@ public:
   void run();
   static void addToActionLog(std::string &text);
   int getWave() const;
+  void setWave(int value);
   Player &getPlayer() const;
 
 private:

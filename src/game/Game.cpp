@@ -17,6 +17,8 @@ std::vector<std::string> Game::actionLog{};
 
 int Game::getWave() const { return wave; }
 
+void Game::setWave(int value) { wave = value; }
+
 Player &Game::getPlayer() const { return *player; }
 
 EnemyType Game::getRandomEnemyType() {
@@ -173,12 +175,18 @@ void Game::startMenu() {
   switch (selected) {
   case 0:
     newGame();
+    break;
 
   case 1:
-    return;
+    if (!player) {
+      player = std::make_unique<Player>("Default", Stats{100, 100, 10, 5});
+    }
+    saveManager.loadGame(*this, saveDir / "save.txt");
+    break;
 
   case 2:
     return;
+    break;
   }
 }
 
@@ -204,6 +212,7 @@ void Game::run() {
       int xp{calculateWaveXP()};
       player->addXP(calculateWaveXP());
       wave++;
+      saveManager.saveGame(*this, saveDir / "save.txt");
 
     } else if (playAgain()) {
       player.reset();
@@ -213,8 +222,6 @@ void Game::run() {
       gameOver = true;
     }
   }
-
-  saveManager.saveGame(*this, saveDir / "save.txt");
 
   return;
 }
