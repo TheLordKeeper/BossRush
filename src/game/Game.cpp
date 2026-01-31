@@ -68,8 +68,10 @@ int Game::getGameSelection(Enemy &enemy, std::vector<std::string> &choices) {
   while (run) {
     clear();
     printw("Wave: %i\n", wave);
+    printw("%s (Level %i)\n", player->name.c_str(), player->getLevel());
     ui.printHealthBar(*player);
     printw("\n");
+    printw("%s\n", enemy.name.c_str());
     ui.printHealthBar(enemy);
     printw("\n");
 
@@ -116,7 +118,6 @@ void Game::enemyTurn(Enemy &enemy) {
 bool Game::generateStage(Enemy &enemy) {
   bool run{true};
   std::vector<std::string> attackChoices{"Attack", "Skills", "Items"};
-  actionLog = {};
 
   const int Attack{0};
   const int Skills{1};

@@ -32,6 +32,8 @@ public:
   Player(const std::string &n, const Stats &s) : Character(n, s) {};
   void addXP(int amount);
   void levelUp();
+  int& getLevel();
+  const int& getLevel() const;
 
 private:
   int level{1};

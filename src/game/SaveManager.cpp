@@ -4,11 +4,13 @@
 #include <fstream>
 #include <string>
 
-enum class tokens { Name, Wave, maxHealth, Health, Attack, Defence, Unknown };
+enum class tokens { Name, Level, Wave, maxHealth, Health, Attack, Defence, Unknown };
 
 tokens parseTokens(const std::string key) {
   if (key == "Name")
     return tokens::Name;
+  if (key == "Level")
+    return tokens::Level;
   if (key == "Wave")
     return tokens::Wave;
   if (key == "maxHealth")
@@ -31,6 +33,7 @@ bool SaveManager::saveGame(Game &game, const std::filesystem::path &path) {
   const Player &player{game.getPlayer()};
 
   file << "Name: " << player.name << "\n";
+  file << "Level: " << player.getLevel() << "\n";
   file << "Wave: " << game.getWave() << "\n";
   file << "maxHealth: " << player.stats.maxHealth << "\n";
   file << "Health: " << player.stats.health << "\n";
@@ -80,6 +83,10 @@ bool SaveManager::loadGame(Game &game, const std::filesystem::path &path) {
 
       case tokens::Wave:
         game.setWave(std::stoi(value));
+        break;
+
+      case tokens::Level:
+        player.getLevel() = std::stoi(value);
         break;
 
       default:

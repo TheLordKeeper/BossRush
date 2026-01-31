@@ -68,7 +68,7 @@ void UI::printHealthBar(Character &character) {
   else
     color = 3;
 
-  printw("%s\nHP: {", character.name.c_str());
+  printw("HP: {", character.name.c_str());
 
   attron(COLOR_PAIR(color));
   for (int i{}; i < full; i++) {
@@ -84,6 +84,7 @@ void UI::printHealthBar(Character &character) {
 
 void UI::printActionLog(std::vector<std::string> &actionLog) {
   for (auto log : actionLog) {
+    printw("\n");
     printw(log.c_str());
     printw("\n");
   }

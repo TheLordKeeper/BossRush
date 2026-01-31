@@ -16,7 +16,7 @@ void Character::basicAttack(Character &target) {
 
   target.takeDamage(damage);
 
-  std::string text = "\n" + this->name + " dealt " + std::to_string(damage) +
+  std::string text = this->name + " dealt " + std::to_string(damage) +
                      " damage to " + target.name + "!";
 
   Game::addToActionLog(text);
@@ -49,6 +49,10 @@ std::string Enemy::typeToName(EnemyType type) {
     return "Enemy";
   }
 }
+
+int &Player::getLevel() { return level; }
+
+const int &Player::getLevel() const { return level; }
 
 void Player::levelUp() {
   xp -= xpUntilLevel;
