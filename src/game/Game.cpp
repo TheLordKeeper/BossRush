@@ -167,27 +167,31 @@ int Game::calculateWaveXP() {
   return static_cast<int>(20 * std::pow(wave, 1.15));
 }
 
-void Game::startMenu() {
+bool Game::startMenu() {
   std::string prompt{"Welcome to my game! Please selected an option"};
   std::vector<std::string> choices{"New Game", "Load Game", "Exit"};
 
-  int selected{ui.getMenuSelection(choices, prompt)};
+  int selected{0};
 
-  switch (selected) {
-  case 0:
-    newGame();
-    break;
+  while (true) {
+    selected = ui.getMenuSelection(choices, prompt);
+    switch (selected) {
+    case 0:
+      newGame();
+      return true;
+      break;
 
-  case 1:
-    if (!player) {
-      player = std::make_unique<Player>("Default", Stats{100, 100, 10, 5});
+    case 1:
+      if (!saveManager.loadGame(*this, saveDir / "save.txt")) {
+          continue;
+      };
+      return true;
+      break;
+
+    case 2:
+      return false;
+      break;
     }
-    saveManager.loadGame(*this, saveDir / "save.txt");
-    break;
-
-  case 2:
-    return;
-    break;
   }
 }
 
@@ -199,16 +203,16 @@ void Game::run() {
   init_pair(2, COLOR_YELLOW, COLOR_BLACK);
   init_pair(3, COLOR_RED, COLOR_BLACK);
 
-  Game::startMenu();
-
-  if (!player) {
+  if (!Game::startMenu()) {
     return;
   }
 
   while (!gameOver) {
     auto enemy{generateEnemy()};
 
-    if (generateStage(*enemy)) { // If the player wins
+    bool playerWin{generateStage(*enemy)};
+
+    if (playerWin) {
       actionLog.clear();
       int xp{calculateWaveXP()};
       player->addXP(calculateWaveXP());
@@ -223,6 +227,4 @@ void Game::run() {
       gameOver = true;
     }
   }
-
-  return;
 }

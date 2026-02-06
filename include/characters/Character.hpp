@@ -29,6 +29,8 @@ private:
 
 class Player : public Character {
 public:
+  Player() : Character("", Stats{}) {}
+
   Player(const std::string &n, const Stats &s) : Character(n, s) {};
   void addXP(int amount);
   void levelUp();

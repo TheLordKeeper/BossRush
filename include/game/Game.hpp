@@ -21,7 +21,7 @@ public:
 
 private:
   std::filesystem::path saveDir;
-  void startMenu();
+  bool startMenu();
   std::unique_ptr<Enemy> generateEnemy();
   EnemyType getRandomEnemyType();
   int getGameSelection(Enemy &enemy, std::vector<std::string> &choices);
@@ -34,5 +34,5 @@ private:
   static std::vector<std::string> actionLog;
 
   int wave{1};
-  std::unique_ptr<Player> player;
+  std::unique_ptr<Player> player{std::make_unique<Player>()};
 };
