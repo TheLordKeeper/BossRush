@@ -19,6 +19,12 @@ public:
 
       active = true;
     }
+  std::atexit([]() {
+      if (active) {
+        endwin();
+        active = false;
+      }
+    });
   }
 
   ~NcursesSession() {

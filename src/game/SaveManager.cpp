@@ -1,7 +1,9 @@
 #include "../../include/game/SaveManager.hpp"
 #include "../../include/characters/Character.hpp"
 #include "../../include/game/Game.hpp"
+#include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 enum class tokens { Name, Level, Wave, maxHealth, Health, Attack, Defence, Unknown };
@@ -96,4 +98,12 @@ bool SaveManager::loadGame(Game &game, const std::filesystem::path &path) {
   }
 
   return true;
+}
+
+void SaveManager::eraseGame(Game &game, const std::filesystem::path &path) {
+  std::filesystem::path file = path / "save.txt";
+  if(!std::filesystem::remove(file)) {
+    std::cerr << "Error occured when deleting file";
+  }
+  exit(1);
 }

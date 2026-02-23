@@ -225,6 +225,7 @@ void Game::run() {
       wave = 1;
     } else {
       gameOver = true;
+      saveManager.eraseGame(*this, saveDir);
     }
   }
 }
